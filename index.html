@@ -1,0 +1,454 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<meta name="theme-color" content="#534AB7">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="LGS Asistan">
+<title>LGS Hazırlık Asistanı</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/tabler-icons.min.css">
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;font-size:15px;background:#f5f4ff;min-height:100vh;padding-bottom:2rem}
+.app{max-width:480px;margin:0 auto;padding:0 16px}
+.screen{display:none}
+.screen.active{display:block}
+
+/* TOP BAR */
+.top-bar{display:flex;align-items:center;gap:10px;padding:1rem 0 0.75rem;border-bottom:1px solid #e8e6ff;margin-bottom:1.25rem}
+.top-bar h2{font-size:16px;font-weight:600;color:#1a1a2e;flex:1}
+.agent-badge{font-size:11px;padding:3px 10px;border-radius:20px;font-weight:600}
+.badge-mot{background:#EEEDFE;color:#3C3489}
+.badge-tani{background:#E1F5EE;color:#085041}
+.badge-plan{background:#FAEEDA;color:#633806}
+.badge-odak{background:#FAECE7;color:#712B13}
+
+/* PROGRESS */
+.progress-steps{display:flex;gap:6px;padding:1rem 0 0;justify-content:center}
+.step-dot{width:8px;height:8px;border-radius:50%;background:#d0ceee;transition:all 0.3s}
+.step-dot.done{background:#534AB7}
+.step-dot.active{background:#534AB7;width:24px;border-radius:4px}
+
+/* CARDS */
+.card{background:#fff;border:1px solid #e8e6ff;border-radius:16px;padding:1rem 1.25rem;margin-bottom:1rem;box-shadow:0 2px 8px rgba(83,74,183,0.06)}
+
+/* BUTTONS */
+.primary-btn{width:100%;padding:14px;border-radius:14px;border:none;background:#534AB7;color:#fff;font-size:15px;font-weight:600;cursor:pointer;margin-top:0.5rem;transition:background 0.2s}
+.primary-btn:hover{background:#3C3489}
+.primary-btn:disabled{opacity:0.4;pointer-events:none}
+.primary-btn.green{background:#3B6D11}
+.primary-btn.red{background:#A32D2D}
+.primary-btn.gray{background:#f0eff8;color:#534AB7;border:1px solid #e0deff}
+.btn-row{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+
+/* OPTIONS */
+.options-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:1rem}
+.opt-btn{padding:12px 8px;border-radius:12px;border:1.5px solid #e0deff;background:#fff;color:#444;font-size:14px;cursor:pointer;text-align:center;line-height:1.4;transition:all 0.2s}
+.opt-btn:hover{background:#f5f4ff;border-color:#7F77DD}
+.opt-btn.selected{border:2px solid #534AB7;background:#EEEDFE;color:#3C3489;font-weight:600}
+
+/* CHAT BUBBLE */
+.chat-bubble{background:#EEEDFE;border-radius:16px;border-bottom-left-radius:4px;padding:14px 16px;margin-bottom:1rem;font-size:15px;color:#26215C;line-height:1.6}
+
+/* INPUT */
+.name-input,.input-small{width:100%;font-size:15px;padding:12px 14px;border-radius:12px;border:1.5px solid #e0deff;background:#fff;color:#1a1a2e;margin-bottom:10px;outline:none}
+.name-input:focus,.input-small:focus{border-color:#534AB7}
+
+/* METRICS */
+.metric-row{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:1rem}
+.metric{background:#f5f4ff;border-radius:12px;padding:12px;text-align:center}
+.metric-label{font-size:12px;color:#888;margin-bottom:4px}
+.metric-val{font-size:22px;font-weight:700;color:#1a1a2e}
+
+/* SORU */
+.soru-kart{background:#fff;border:1px solid #e8e6ff;border-radius:16px;padding:1rem 1.25rem;margin-bottom:1rem}
+.soru-text{font-size:15px;color:#1a1a2e;line-height:1.6;margin-bottom:1rem}
+.score-bar-bg{height:6px;background:#e8e6ff;border-radius:4px;margin:0 0 1rem;overflow:hidden}
+.score-bar-fill{height:6px;border-radius:4px;background:#534AB7;transition:width 0.5s}
+
+/* TAGS */
+.tag{display:inline-block;font-size:12px;padding:4px 10px;border-radius:20px;margin:3px;font-weight:500}
+.tag-zayif{background:#FCEBEB;color:#791F1F}
+.tag-iyi{background:#EAF3DE;color:#27500A}
+
+/* PLAN */
+.plan-item{display:flex;gap:12px;align-items:flex-start;padding:10px 0;border-bottom:1px solid #f0eff8}
+.plan-item:last-child{border-bottom:none}
+.plan-day{font-size:12px;font-weight:700;color:#534AB7;min-width:36px;padding-top:2px}
+.plan-detail{font-size:14px;color:#1a1a2e;line-height:1.5;font-weight:500}
+.plan-sub{font-size:12px;color:#888;margin-top:2px}
+
+/* TABS */
+.tab-bar{display:flex;gap:4px;margin-bottom:1.25rem;background:#e8e6ff;border-radius:14px;padding:4px}
+.tab{flex:1;padding:9px 4px;border:none;background:none;border-radius:10px;font-size:13px;color:#666;cursor:pointer;font-family:inherit;transition:all 0.2s}
+.tab.active{background:#fff;color:#534AB7;font-weight:600;box-shadow:0 1px 4px rgba(83,74,183,0.15)}
+.panel{display:none}
+.panel.active{display:block}
+
+/* POMODORO */
+.pomo-circle{width:190px;height:190px;margin:1.25rem auto;position:relative}
+.pomo-circle svg{transform:rotate(-90deg)}
+.pomo-time{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);text-align:center}
+.pomo-time-text{font-size:34px;font-weight:700;color:#1a1a2e}
+.pomo-mode-text{font-size:12px;color:#888;margin-top:2px}
+.pomo-dots{display:flex;gap:8px;justify-content:center;margin:0.75rem 0}
+.pomo-dot{width:10px;height:10px;border-radius:50%;background:#e0deff}
+.pomo-dot.done{background:#534AB7}
+
+/* NEFES */
+.nefes-circle{width:170px;height:170px;border-radius:50%;margin:1.25rem auto;display:flex;align-items:center;justify-content:center;border:4px solid #534AB7;background:#EEEDFE;transition:all 0.5s}
+.nefes-text{font-size:16px;font-weight:600;color:#3C3489;text-align:center;line-height:1.5}
+.nefes-count{font-size:13px;color:#534AB7;margin-top:4px}
+.nefes-progress{height:6px;background:#e8e6ff;border-radius:4px;margin:1rem 0;overflow:hidden}
+.nefes-fill{height:6px;background:#534AB7;border-radius:4px;transition:width 0.3s}
+
+/* STREAK */
+.streak-row{display:flex;gap:6px;margin:0.75rem 0;flex-wrap:wrap}
+.streak-day{width:36px;height:36px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:600}
+.streak-done{background:#EAF3DE;color:#27500A}
+.streak-today{background:#534AB7;color:#fff}
+.streak-miss{background:#f0eff8;color:#aaa}
+
+/* KONU BARS */
+.konu-row{display:flex;align-items:center;gap:10px;padding:10px 0;border-bottom:1px solid #f0eff8}
+.konu-row:last-child{border-bottom:none}
+.konu-ad{font-size:13px;color:#1a1a2e;flex:1}
+.konu-bar-bg{width:80px;height:7px;background:#e8e6ff;border-radius:4px;overflow:hidden}
+.konu-bar-fill{height:7px;border-radius:4px;background:#534AB7;transition:width 0.5s}
+.konu-pct{font-size:12px;color:#888;min-width:30px;text-align:right}
+
+/* ODAK KART */
+.odak-kart{border-radius:14px;padding:1rem;margin-bottom:0.75rem;border:1px solid #e8e6ff}
+
+/* AVATAR */
+.avatar{width:64px;height:64px;border-radius:50%;background:#EEEDFE;display:flex;align-items:center;justify-content:center;font-size:28px;margin:0 auto 1rem}
+
+/* RESULT */
+.result-icon{font-size:48px;text-align:center;margin:1rem 0 0.5rem}
+
+/* GUN GRID */
+.gun-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:1rem}
+.gun-card{background:#fff;border:1px solid #e8e6ff;border-radius:12px;padding:12px;text-align:center}
+.gun-val{font-size:24px;font-weight:700;color:#534AB7}
+.gun-label{font-size:12px;color:#888;margin-top:3px}
+</style>
+</head>
+<body>
+<div class="app">
+
+<div class="progress-steps" id="progress-steps">
+  <div class="step-dot active" id="pd1"></div>
+  <div class="step-dot" id="pd2"></div>
+  <div class="step-dot" id="pd3"></div>
+  <div class="step-dot" id="pd4"></div>
+</div>
+
+<!-- GİRİŞ -->
+<div id="s-giris" class="screen active">
+  <div style="padding-top:1.5rem">
+    <div class="avatar">📚</div>
+    <div style="text-align:center;margin-bottom:1.5rem">
+      <p style="font-size:20px;font-weight:700;color:#1a1a2e;margin-bottom:6px">LGS Hazırlık Asistanın</p>
+      <p style="font-size:14px;color:#888">Seni tanıyalım, sonra başlayalım!</p>
+    </div>
+    <div class="card">
+      <p style="font-size:14px;color:#666;margin-bottom:8px;font-weight:500">Adın ne?</p>
+      <input class="name-input" id="isim-input" type="text" placeholder="Adını yaz..." />
+      <p style="font-size:14px;color:#666;margin-bottom:8px;font-weight:500">Bugün kendini nasıl hissediyorsun?</p>
+      <div class="options-grid">
+        <button class="opt-btn" onclick="selectMod(this,'enerjik')">⚡ Enerjik</button>
+        <button class="opt-btn" onclick="selectMod(this,'yorgun')">😴 Biraz yorgun</button>
+        <button class="opt-btn" onclick="selectMod(this,'stresli')">😰 Stresli</button>
+        <button class="opt-btn" onclick="selectMod(this,'hazir')">💪 Hazırım!</button>
+      </div>
+    </div>
+    <button class="primary-btn" id="giris-btn" onclick="goMotivation()" disabled>Devam Et →</button>
+  </div>
+</div>
+
+<!-- MOTİVASYON -->
+<div id="s-motivasyon" class="screen">
+  <div class="top-bar">
+    <i class="ti ti-mood-smile" style="font-size:20px;color:#534AB7"></i>
+    <h2>Motivasyon Ajanı</h2>
+    <span class="agent-badge badge-mot">Ajan 1</span>
+  </div>
+  <div id="mot-sorular"></div>
+  <button class="primary-btn" id="mot-btn" onclick="goTaniBasla()" disabled>Teste Geç →</button>
+</div>
+
+<!-- TANI TESTİ -->
+<div id="s-tani" class="screen">
+  <div class="top-bar">
+    <i class="ti ti-clipboard-list" style="font-size:20px;color:#0F6E56"></i>
+    <h2>Tanı Testi</h2>
+    <span class="agent-badge badge-tani">Ajan 2</span>
+  </div>
+  <div id="tani-icerik"></div>
+</div>
+
+<!-- ÇALIŞMA PLANI -->
+<div id="s-plan" class="screen">
+  <div class="top-bar">
+    <i class="ti ti-calendar-check" style="font-size:20px;color:#854F0B"></i>
+    <h2>Çalışma Planın</h2>
+    <span class="agent-badge badge-plan">Ajan 3</span>
+  </div>
+  <div id="plan-icerik"></div>
+</div>
+
+<!-- ODAKLANMA MODÜLÜ -->
+<div id="s-odak" class="screen">
+  <div class="top-bar">
+    <i class="ti ti-brain" style="font-size:20px;color:#993C1D"></i>
+    <h2>Odaklanma Modülü</h2>
+    <span class="agent-badge badge-odak">Ajan 4</span>
+  </div>
+
+  <div class="tab-bar">
+    <button class="tab active" onclick="switchTab('pomodoro',this)">⏱ Pomodoro</button>
+    <button class="tab" onclick="switchTab('nefes',this)">🌬 Nefes</button>
+    <button class="tab" onclick="switchTab('ilerleme',this)">📊 İlerleme</button>
+  </div>
+
+  <!-- POMODORO -->
+  <div id="panel-pomodoro" class="panel active">
+    <div class="card" style="text-align:center">
+      <p style="font-size:13px;color:#888;margin-bottom:0.5rem" id="pomo-ders-label">Çalışma seansı</p>
+      <div class="pomo-circle">
+        <svg width="190" height="190" viewBox="0 0 190 190">
+          <circle cx="95" cy="95" r="84" fill="none" stroke="#e8e6ff" stroke-width="10"/>
+          <circle cx="95" cy="95" r="84" fill="none" stroke="#534AB7" stroke-width="10"
+            stroke-dasharray="528" id="pomo-arc" stroke-dashoffset="0" stroke-linecap="round"/>
+        </svg>
+        <div class="pomo-time">
+          <div class="pomo-time-text" id="pomo-display">25:00</div>
+          <div class="pomo-mode-text" id="pomo-mode">Çalışma</div>
+        </div>
+      </div>
+      <div class="pomo-dots">
+        <div class="pomo-dot" id="ppd0"></div>
+        <div class="pomo-dot" id="ppd1"></div>
+        <div class="pomo-dot" id="ppd2"></div>
+        <div class="pomo-dot" id="ppd3"></div>
+      </div>
+      <select class="input-small" id="pomo-ders-sec" style="margin-bottom:10px">
+        <option>Türkçe</option>
+        <option>Matematik</option>
+        <option>Karma tekrar</option>
+      </select>
+      <div class="btn-row">
+        <button class="primary-btn" id="pomo-start-btn" onclick="pomodoroToggle()">▶ Başlat</button>
+        <button class="primary-btn gray" onclick="pomodoroReset()">↺ Sıfırla</button>
+      </div>
+    </div>
+    <div class="card">
+      <p style="font-size:13px;font-weight:600;color:#888;margin-bottom:8px">Bugünkü seanslar</p>
+      <div style="display:flex;align-items:center;gap:10px">
+        <span style="font-size:30px;font-weight:700;color:#534AB7" id="pomo-bugun-sayi">0</span>
+        <span style="font-size:13px;color:#888">tamamlanan pomodoro</span>
+      </div>
+      <p style="font-size:12px;color:#aaa;margin-top:6px" id="pomo-bugun-sure">Toplam: 0 dakika çalışma</p>
+    </div>
+  </div>
+
+  <!-- NEFES -->
+  <div id="panel-nefes" class="panel">
+    <div class="card" style="text-align:center">
+      <p style="font-size:14px;color:#666;margin-bottom:0.25rem;font-weight:500">4 — 7 — 8 Nefes Tekniği</p>
+      <p style="font-size:12px;color:#aaa;margin-bottom:0.5rem">Çalışmadan önce 3 tur yap</p>
+      <div class="nefes-circle" id="nefes-circle">
+        <div>
+          <div class="nefes-text" id="nefes-eylem">Hazır mısın?</div>
+          <div class="nefes-count" id="nefes-sayac"></div>
+        </div>
+      </div>
+      <div class="nefes-progress"><div class="nefes-fill" id="nefes-fill" style="width:0%"></div></div>
+      <p style="font-size:13px;color:#888;margin-bottom:1rem">Tur: <span id="nefes-tur">0</span> / 3</p>
+      <button class="primary-btn" id="nefes-btn" onclick="nefesToggle()">Egzersizi Başlat</button>
+    </div>
+    <div class="card">
+      <p style="font-size:13px;font-weight:600;color:#888;margin-bottom:10px">Nasıl yapılır?</p>
+      <div style="font-size:14px;color:#1a1a2e;line-height:2.2">
+        <div><span style="color:#534AB7;font-weight:700">4 sn</span> — Burnundan içeri çek</div>
+        <div><span style="color:#3B6D11;font-weight:700">7 sn</span> — Nefesi tut</div>
+        <div><span style="color:#993C1D;font-weight:700">8 sn</span> — Ağızdan dışarı ver</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- İLERLEME -->
+  <div id="panel-ilerleme" class="panel">
+    <div class="gun-grid">
+      <div class="gun-card"><div class="gun-val" id="il-toplam-soru">0</div><div class="gun-label">Toplam soru</div></div>
+      <div class="gun-card"><div class="gun-val" id="il-pomo">0</div><div class="gun-label">Pomodoro</div></div>
+      <div class="gun-card"><div class="gun-val" id="il-streak">3</div><div class="gun-label">Gün serisi</div></div>
+      <div class="gun-card"><div class="gun-val" id="il-nefes">0</div><div class="gun-label">Nefes turu</div></div>
+    </div>
+    <div class="card">
+      <p style="font-size:13px;font-weight:600;color:#888;margin-bottom:10px">Bu hafta</p>
+      <div class="streak-row">
+        <div class="streak-day streak-done">Pzt</div>
+        <div class="streak-day streak-done">Sal</div>
+        <div class="streak-day streak-done">Çrş</div>
+        <div class="streak-day streak-today">Prş</div>
+        <div class="streak-day streak-miss">Cum</div>
+        <div class="streak-day streak-miss">Cmt</div>
+        <div class="streak-day streak-miss">Paz</div>
+      </div>
+    </div>
+    <div class="card">
+      <p style="font-size:13px;font-weight:600;color:#888;margin-bottom:10px">Ders bazlı ilerleme</p>
+      <div class="konu-row"><span class="konu-ad">Türkçe — Fiil Çekimi</span><div class="konu-bar-bg"><div class="konu-bar-fill" style="width:70%"></div></div><span class="konu-pct">70%</span></div>
+      <div class="konu-row"><span class="konu-ad">Türkçe — Anlam</span><div class="konu-bar-bg"><div class="konu-bar-fill" style="width:45%"></div></div><span class="konu-pct">45%</span></div>
+      <div class="konu-row"><span class="konu-ad">Matematik — Kesirler</span><div class="konu-bar-bg"><div class="konu-bar-fill" style="width:60%"></div></div><span class="konu-pct">60%</span></div>
+      <div class="konu-row"><span class="konu-ad">Matematik — Denklem</span><div class="konu-bar-bg"><div class="konu-bar-fill" style="width:30%"></div></div><span class="konu-pct">30%</span></div>
+    </div>
+    <div class="card">
+      <p style="font-size:13px;font-weight:600;color:#888;margin-bottom:8px">Bugün çözdüğün soruları ekle</p>
+      <select class="input-small" id="il-ders"><option>Türkçe</option><option>Matematik</option></select>
+      <input class="input-small" id="il-soru-sayi" type="number" min="1" max="100" placeholder="Kaç soru çözdün?" />
+      <button class="primary-btn green" onclick="soruEkle()">✓ Kaydet</button>
+    </div>
+  </div>
+</div>
+
+</div><!-- /app -->
+
+<script>
+let state={isim:'',mod:'',motCevaplar:[],dogruSayisi:0,yanlisKonular:[]};
+const MOT_SORULAR=[
+  {soru:"LGS'ye ne kadar süren var?",secenekler:["1 aydan az","1-3 ay","3-6 ay","6 ay+"]},
+  {soru:"Günde kaç saat çalışıyorsun?",secenekler:["30 dk'dan az","1 saat","2 saat","2 saat+"]},
+  {soru:"En çok hangi ders seni zorluyor?",secenekler:["Türkçe","Matematik","İkisi de","Hiçbiri"]},
+];
+const TANI_SORULAR=[
+  {ders:"Türkçe",konu:"Fiil Çekimi",soru:"'Koşmak' fiilinin geniş zaman 3. tekil şahsı hangisidir?",secenekler:["koşar","koştu","koşacak","koşmuş"],dogru:0},
+  {ders:"Türkçe",konu:"Anlam Bilgisi",soru:"'Eli maşa tutmaz oldu.' cümlesinde altı çizili sözcük hangi anlam özelliğini taşır?",secenekler:["Gerçek anlam","Mecaz anlam","Terim anlam","Yan anlam"],dogru:1},
+  {ders:"Matematik",konu:"Kesirler",soru:"2/3 + 1/4 işleminin sonucu nedir?",secenekler:["3/7","8/12","11/12","3/12"],dogru:2},
+  {ders:"Matematik",konu:"Denklemler",soru:"3x + 6 = 15 denkleminde x kaçtır?",secenekler:["x=2","x=3","x=4","x=7"],dogru:1},
+  {ders:"Türkçe",konu:"Noktalama",soru:"Aşağıdaki cümlelerin hangisinde noktalama doğru kullanılmıştır?",secenekler:["Bugün hava güzel, değil mi?","Bugün hava güzel değil mi.","Bugün hava güzel değil, mi?","Bugün hava güzel; değil mi?"],dogru:0},
+  {ders:"Matematik",konu:"Olasılık",soru:"Bir torbada 3 kırmızı, 2 mavi top var. Mavi çekme olasılığı nedir?",secenekler:["1/5","2/5","3/5","2/3"],dogru:1},
+];
+let soruIndex=0,seciliCevap=-1;
+let pomoInterval=null,pomoRunning=false,pomoSeconds=25*60,pomoMode='work',pomoTur=0,pomoBugunSayi=0,pomoBugunDak=0;
+let nefesInterval=null,nefesRunning=false,nefesTur=0,nefesPhase=0,nefesPhaseTime=0,ilNefes=0,ilToplamSoru=0;
+const NEFES_PHASES=[{ad:'İçeri çek',sure:4,renk:'#534AB7'},{ad:'Tut',sure:7,renk:'#3B6D11'},{ad:'Dışarı ver',sure:8,renk:'#993C1D'}];
+
+document.getElementById('isim-input').addEventListener('input',function(){state.isim=this.value.trim();checkGirisBtn();});
+function selectMod(btn,mod){document.querySelectorAll('#s-giris .opt-btn').forEach(b=>b.classList.remove('selected'));btn.classList.add('selected');state.mod=mod;checkGirisBtn();}
+function checkGirisBtn(){document.getElementById('giris-btn').disabled=!(state.isim&&state.mod);}
+function setStep(n){for(let i=1;i<=4;i++){const d=document.getElementById('pd'+i);if(i<n)d.className='step-dot done';else if(i===n)d.className='step-dot active';else d.className='step-dot';}}
+function showScreen(id,step){document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));document.getElementById(id).classList.add('active');setStep(step);}
+
+function goMotivation(){
+  showScreen('s-motivasyon',2);
+  const msgs={enerjik:`Harika ${state.isim}! Enerjin yerinde, bugün çok şey başarabilirsin! 🚀`,yorgun:`Sorun değil ${state.isim}, yavaş yavaş ısınalım. Her adım önemli! 💙`,stresli:`Stres normal ${state.isim}. Birlikte adım adım gidelim, seni hazırlarız! 🤗`,hazir:`Süper ${state.isim}! Bu enerjiyle LGS'yi geçersin! 🏆`};
+  let html=`<div class="chat-bubble">${msgs[state.mod]}</div>`;
+  MOT_SORULAR.forEach((s,i)=>{
+    html+=`<div class="card"><p style="font-size:14px;font-weight:600;color:#1a1a2e;margin-bottom:10px">${i+1}. ${s.soru}</p><div class="options-grid">${s.secenekler.map((o,j)=>`<button class="opt-btn" onclick="selectMot(this,${i},${j})">${o}</button>`).join('')}</div></div>`;
+  });
+  document.getElementById('mot-sorular').innerHTML=html;
+  state.motCevaplar=new Array(MOT_SORULAR.length).fill(-1);
+}
+
+function selectMot(btn,si,ci){btn.closest('.card').querySelectorAll('.opt-btn').forEach(b=>b.classList.remove('selected'));btn.classList.add('selected');state.motCevaplar[si]=ci;if(state.motCevaplar.every(c=>c!==-1))document.getElementById('mot-btn').disabled=false;}
+
+function goTaniBasla(){soruIndex=0;seciliCevap=-1;state.dogruSayisi=0;state.yanlisKonular=[];showScreen('s-tani',3);renderTaniSoru();}
+
+function renderTaniSoru(){
+  if(soruIndex>=TANI_SORULAR.length){renderTaniSonuc();return;}
+  const s=TANI_SORULAR[soruIndex];seciliCevap=-1;
+  document.getElementById('tani-icerik').innerHTML=`
+    <div style="display:flex;align-items:center;gap:8px;margin-bottom:0.75rem">
+      <span style="font-size:12px;background:#E1F5EE;color:#085041;padding:3px 10px;border-radius:20px;font-weight:600">${s.ders}</span>
+      <span style="font-size:12px;color:#888">${s.konu}</span>
+      <span style="margin-left:auto;font-size:13px;color:#888;font-weight:600">${soruIndex+1}/${TANI_SORULAR.length}</span>
+    </div>
+    <div class="score-bar-bg"><div class="score-bar-fill" style="width:${Math.round(soruIndex/TANI_SORULAR.length*100)}%"></div></div>
+    <div class="soru-kart">
+      <p class="soru-text">${s.soru}</p>
+      <div style="display:flex;flex-direction:column;gap:8px" id="cevap-list">
+        ${s.secenekler.map((o,j)=>`<button class="opt-btn" style="text-align:left;padding:12px 14px;width:100%" onclick="selectTani(this,${j})">${String.fromCharCode(65+j)}) ${o}</button>`).join('')}
+      </div>
+    </div>
+    <button class="primary-btn" id="tani-ileri" onclick="nextTani()" disabled>Sonraki →</button>`;
+}
+
+function selectTani(btn,idx){document.querySelectorAll('#cevap-list .opt-btn').forEach(b=>b.classList.remove('selected'));btn.classList.add('selected');seciliCevap=idx;document.getElementById('tani-ileri').disabled=false;}
+
+function nextTani(){
+  const s=TANI_SORULAR[soruIndex];
+  if(seciliCevap===s.dogru)state.dogruSayisi++;
+  else if(!state.yanlisKonular.includes(s.konu))state.yanlisKonular.push(s.konu);
+  soruIndex++;renderTaniSoru();
+}
+
+function renderTaniSonuc(){
+  const puan=Math.round(state.dogruSayisi/TANI_SORULAR.length*100);
+  const icon=puan>=80?'🏆':puan>=50?'💪':'📖';
+  const mesaj=puan>=80?'Harika gidiyorsun!':puan>=50?'İyi iş, gelişiyorsun!':'Birlikte çalışalım!';
+  const konuTaglari=TANI_SORULAR.map(s=>`<span class="tag ${state.yanlisKonular.includes(s.konu)?'tag-zayif':'tag-iyi'}">${state.yanlisKonular.includes(s.konu)?'':'✓ '}${s.konu}</span>`).filter((v,i,a)=>a.indexOf(v)===i).join('');
+  document.getElementById('tani-icerik').innerHTML=`
+    <div class="result-icon">${icon}</div>
+    <div style="text-align:center;margin-bottom:1.25rem">
+      <p style="font-size:24px;font-weight:700;color:#1a1a2e">${state.dogruSayisi}/${TANI_SORULAR.length} doğru</p>
+      <p style="font-size:15px;color:#534AB7;font-weight:600;margin-top:4px">${mesaj}</p>
+    </div>
+    <div class="metric-row">
+      <div class="metric"><div class="metric-label">Türkçe</div><div class="metric-val">${getTurkceScore()}/3</div></div>
+      <div class="metric"><div class="metric-label">Matematik</div><div class="metric-val">${getMatScore()}/3</div></div>
+    </div>
+    <div class="card"><p style="font-size:13px;font-weight:600;color:#888;margin-bottom:8px">Konu analizi</p><div>${konuTaglari}</div></div>
+    <button class="primary-btn" onclick="goPlan()">Çalışma Planımı Oluştur →</button>`;
+}
+
+function getTurkceScore(){let d=0;TANI_SORULAR.forEach((s,i)=>{if(s.ders==='Türkçe'&&!state.yanlisKonular.includes(s.konu))d++;});return Math.min(d,3);}
+function getMatScore(){let d=0;TANI_SORULAR.forEach((s,i)=>{if(s.ders==='Matematik'&&!state.yanlisKonular.includes(s.konu))d++;});return Math.min(d,3);}
+
+function goPlan(){
+  showScreen('s-plan',4);
+  const z=state.yanlisKonular;
+  const planItems=[
+    {gun:"Pzt",baslik:"Türkçe — Fiil Çekimi",alt:"20 dk okuma + 10 soru",zayif:z.includes('Fiil Çekimi')},
+    {gun:"Sal",baslik:"Matematik — Kesirler",alt:"Konu tekrarı + 15 soru",zayif:z.includes('Kesirler')},
+    {gun:"Çrş",baslik:"Türkçe — Anlam Bilgisi",alt:"Metin analizi + 10 soru",zayif:z.includes('Anlam Bilgisi')},
+    {gun:"Prş",baslik:"Matematik — Denklemler",alt:"Alıştırma seti",zayif:z.includes('Denklemler')},
+    {gun:"Cum",baslik:"Karma tekrar",alt:"Her dersten 10 soru karışık",zayif:false},
+    {gun:"Cmt",baslik:"Deneme sınavı",alt:"Zamanlı çözüm pratiği",zayif:false},
+  ];
+  let html=`<div class="chat-bubble">${state.isim}, analizine göre haftalık planın hazır! ${z.length>0?`<b>${z.join(', ')}</b> konularına öncelik verdim.`:'Genel olarak iyi gidiyorsun!'}</div><div class="card">`;
+  planItems.forEach(p=>{html+=`<div class="plan-item"><div class="plan-day">${p.gun}</div><div><div class="plan-detail" style="${p.zayif?'color:#A32D2D':''}">${p.zayif?'⚡ ':''}${p.baslik}</div><div class="plan-sub">${p.alt}</div></div></div>`;});
+  html+=`</div><button class="primary-btn" style="background:#993C1D" onclick="goOdak()">Odaklanma Modülüne Geç →</button>`;
+  document.getElementById('plan-icerik').innerHTML=html;
+}
+
+function goOdak(){showScreen('s-odak',4);}
+
+function switchTab(tab,btn){document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));document.querySelectorAll('.panel').forEach(p=>p.classList.remove('active'));btn.classList.add('active');document.getElementById('panel-'+tab).classList.add('active');}
+
+function formatTime(s){return Math.floor(s/60).toString().padStart(2,'0')+':'+(s%60).toString().padStart(2,'0');}
+function updatePomoArc(){const total=pomoMode==='work'?25*60:(pomoTur>0&&pomoTur%4===0?20*60:5*60);document.getElementById('pomo-arc').setAttribute('stroke-dashoffset',Math.round(528*(pomoSeconds/total)));}
+
+function pomodoroTick(){
+  if(pomoSeconds<=0){
+    clearInterval(pomoInterval);pomoRunning=false;
+    if(pomoMode==='work'){pomoBugunSayi++;pomoBugunDak+=25;document.getElementById('pomo-bugun-sayi').textContent=pomoBugunSayi;document.getElementById('pomo-bugun-sure').textContent='Toplam: '+pomoBugunDak+' dakika çalışma';document.getElementById('il-pomo').textContent=pomoBugunSayi;document.getElementById('ppd'+(pomoTur%4)).classList.add('done');pomoTur++;pomoMode='break';pomoSeconds=(pomoTur%4===0)?20*60:5*60;document.getElementById('pomo-mode').textContent=pomoTur%4===0?'Uzun mola':'Kısa mola';document.getElementById('pomo-arc').setAttribute('stroke','#22c55e');}
+    else{pomoMode='work';pomoSeconds=25*60;document.getElementById('pomo-mode').textContent='Çalışma';document.getElementById('pomo-arc').setAttribute('stroke','#534AB7');}
+    document.getElementById('pomo-start-btn').textContent='▶ Başlat';document.getElementById('pomo-display').textContent=formatTime(pomoSeconds);updatePomoArc();return;
+  }
+  pomoSeconds--;document.getElementById('pomo-display').textContent=formatTime(pomoSeconds);updatePomoArc();
+}
+
+function pomodoroToggle(){if(pomoRunning){clearInterval(pomoInterval);pomoRunning=false;document.getElementById('pomo-start-btn').textContent='▶ Devam Et';}else{pomoRunning=true;document.getElementById('pomo-start-btn').textContent='⏸ Durdur';document.getElementById('pomo-ders-label').textContent=document.getElementById('pomo-ders-sec').value+' çalışması';pomoInterval=setInterval(pomodoroTick,1000);}}
+function pomodoroReset(){clearInterval(pomoInterval);pomoRunning=false;pomoMode='work';pomoSeconds=25*60;pomoTur=0;document.getElementById('pomo-display').textContent='25:00';document.getElementById('pomo-mode').textContent='Çalışma';document.getElementById('pomo-start-btn').textContent='▶ Başlat';document.getElementById('pomo-arc').setAttribute('stroke','#534AB7');document.getElementById('pomo-arc').setAttribute('stroke-dashoffset','0');for(let i=0;i<4;i++)document.getElementById('ppd'+i).classList.remove('done');}
+
+function nefesToggle(){if(nefesRunning){clearInterval(nefesInterval);nefesRunning=false;document.getElementById('nefes-btn').textContent='▶ Devam Et';document.getElementById('nefes-eylem').textContent='Duraklatıldı';}else{nefesRunning=true;document.getElementById('nefes-btn').textContent='⏸ Durdur';if(nefesTur===0&&nefesPhase===0&&nefesPhaseTime===0)nefesFazBasla();else nefesInterval=setInterval(nefesTick,1000);}}
+function nefesFazBasla(){const faz=NEFES_PHASES[nefesPhase];nefesPhaseTime=faz.sure;document.getElementById('nefes-eylem').textContent=faz.ad;document.getElementById('nefes-circle').style.borderColor=faz.renk;document.getElementById('nefes-circle').style.background=faz.renk+'22';document.getElementById('nefes-fill').style.background=faz.renk;updateNefesFill();nefesInterval=setInterval(nefesTick,1000);}
+function updateNefesFill(){const faz=NEFES_PHASES[nefesPhase];document.getElementById('nefes-fill').style.width=Math.round((1-nefesPhaseTime/faz.sure)*100)+'%';document.getElementById('nefes-sayac').textContent=nefesPhaseTime+' sn';}
+function nefesTick(){nefesPhaseTime--;updateNefesFill();if(nefesPhaseTime<=0){clearInterval(nefesInterval);nefesPhase++;if(nefesPhase>=NEFES_PHASES.length){nefesPhase=0;nefesTur++;ilNefes+=3;document.getElementById('nefes-tur').textContent=nefesTur;document.getElementById('il-nefes').textContent=ilNefes;if(nefesTur>=3){nefesRunning=false;document.getElementById('nefes-eylem').textContent='Tamamlandı! 🎉';document.getElementById('nefes-sayac').textContent='Harika iş!';document.getElementById('nefes-circle').style.borderColor='#3B6D11';document.getElementById('nefes-circle').style.background='#EAF3DE';document.getElementById('nefes-btn').textContent='▶ Tekrar Başlat';nefesTur=0;nefesPhase=0;nefesPhaseTime=0;return;}}if(nefesRunning)nefesFazBasla();}}
+function soruEkle(){const s=parseInt(document.getElementById('il-soru-sayi').value)||0;if(s<=0)return;ilToplamSoru+=s;document.getElementById('il-toplam-soru').textContent=ilToplamSoru;document.getElementById('il-soru-sayi').value='';}
+</script>
+</body>
+</html>
